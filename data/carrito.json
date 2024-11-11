@@ -1,11 +1,15 @@
 [
   {
-    "id": "1730154212223",
-    "products": [
-      {
-        "product": "1730154056637",
-        "quantity": 1
-      }
-    ]
+      "id": "1",
+      "products": [
+          {
+              "product": "1",
+              "quantity": 2
+          },
+          {
+              "product": "5",
+              "quantity": 1
+          }
+      ]
   }
 ]

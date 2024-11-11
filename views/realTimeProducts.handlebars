@@ -1,0 +1,49 @@
+<h1>Agregar Productos en Tiempo Real</h1>
+
+<ul id="productsList">
+    {{#each products}}
+        <li>{{this.title}} - Precio: ${{this.price}}</li>
+    {{/each}}
+</ul>
+
+<form id="productForm">
+    <div class="form-fields">
+        <input type="text" id="title" placeholder="Nombre del producto" required>
+        <input type="number" id="price" placeholder="Precio" required>
+    </div>
+    <div class="button-container">
+        <button type="submit" class="form-button">Agregar Producto</button>
+        <a href="/" class="form-button button-home">Ir a la Lista</a>
+    </div>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    socket.on('productsUpdated', (products) => {
+        const productsList = document.getElementById('productsList');
+        productsList.innerHTML = '';
+        products.forEach(product => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${product.title} - Precio: $${product.price}`;
+            productsList.appendChild(listItem);
+        });
+    });
+
+const productForm = document.getElementById('productForm');
+productForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const title = document.getElementById('title').value;
+    const price = parseFloat(document.getElementById('price').value);
+
+    if (title && !isNaN(price)) {
+        socket.emit('addProduct', { title, price });
+        productForm.reset();
+        
+        location.reload();
+    } else {
+        alert("Por favor, complete todos los campos correctamente.");
+    }
+});
+</script>

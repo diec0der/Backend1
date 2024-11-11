@@ -1,0 +1,11 @@
+<h1>Lista de Productos</h1>
+
+<ul>
+    {{#each products}}
+        <li>{{this.title}} - Precio: ${{this.price}}</li>
+    {{/each}}
+</ul>
+
+<div class="button-container">
+    <a href="/realtimeproducts" class="form-button button-add-more">Agregar más productos</a>
+</div>
