@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Tienda</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        function addToCart(cartId, productId) {
+            fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'POST' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al agregar el producto');
+                    return response.json();
+                })
+                .catch(error => console.error(error));
+        }
+    </script>
 </head>
 <body>
-    {{> navbar }}
-
+    <header>
+        {{> navbar }}
+    </header>
     <main class="main-content">
         {{{body}}}
     </main>
-
-    {{> footer }}
+    <footer class="footer">
+        {{> footer }}
+    </footer>
 </body>
 </html>

@@ -1,49 +1,79 @@
-<h1>Agregar Productos en Tiempo Real</h1>
-
-<ul id="productsList">
-    {{#each products}}
-        <li>{{this.title}} - Precio: ${{this.price}}</li>
-    {{/each}}
-</ul>
-
-<form id="productForm">
-    <div class="form-fields">
-        <input type="text" id="title" placeholder="Nombre del producto" required>
-        <input type="number" id="price" placeholder="Precio" required>
+<div class="container">
+    <h1 class="text-center">Productos en Tiempo Real</h1>
+    <form id="addProductForm" class="mb-4">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="title" class="form-label">Nombre</label>
+                <input type="text" id="title" class="form-control" required />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Precio</label>
+                <input type="number" id="price" class="form-control" required />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="category" class="form-label">Categoría</label>
+                <input type="text" id="category" class="form-control" required />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="stock" class="form-label">Stock</label>
+                <input type="number" id="stock" class="form-control" required />
+            </div>
+            <div class="col-md-12 mb-3">
+                <label for="description" class="form-label">Descripción</label>
+                <input type="text" id="description" class="form-control" required />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Producto</button>
+    </form>
+    <div id="productList">
+        {{#each products}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p class="card-text">{{this.description}}</p>
+                <p class="text-muted">Precio: ${{this.price}}</p>
+                <p class="text-muted">Stock: {{this.stock}}</p>
+                <button class="btn btn-danger btn-sm" onclick="deleteProduct('{{this._id}}')">Eliminar</button>
+            </div>
+        </div>
+        {{/each}}
     </div>
-    <div class="button-container">
-        <button type="submit" class="form-button">Agregar Producto</button>
-        <a href="/" class="form-button button-home">Ir a la Lista</a>
-    </div>
-</form>
-
-<script src="/socket.io/socket.io.js"></script>
+</div>
 <script>
-    const socket = io();
+    document.getElementById('addProductForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const title = document.getElementById('title').value;
+        const price = document.getElementById('price').value;
+        const description = document.getElementById('description').value;
+        const stock = document.getElementById('stock').value;
+        const category = document.getElementById('category').value;
 
-    socket.on('productsUpdated', (products) => {
-        const productsList = document.getElementById('productsList');
-        productsList.innerHTML = '';
-        products.forEach(product => {
-            const listItem = document.createElement('li');
-            listItem.textContent = `${product.title} - Precio: $${product.price}`;
-            productsList.appendChild(listItem);
-        });
+        try {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, price, description, stock, category }),
+            });
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                throw new Error('Error al agregar el producto');
+            }
+        } catch (error) {
+            console.error(error);
+        }
     });
 
-const productForm = document.getElementById('productForm');
-productForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const title = document.getElementById('title').value;
-    const price = parseFloat(document.getElementById('price').value);
-
-    if (title && !isNaN(price)) {
-        socket.emit('addProduct', { title, price });
-        productForm.reset();
-        
-        location.reload();
-    } else {
-        alert("Por favor, complete todos los campos correctamente.");
+    async function deleteProduct(productId) {
+        try {
+            const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                throw new Error('Error al eliminar el producto');
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
-});
 </script>

@@ -1,0 +1,24 @@
+<div class="container">
+    <h1 class="text-center">{{product.title}}</h1>
+    <p class="text-muted text-center">Categoría: {{product.category}}</p>
+    <p class="text-center">{{product.description}}</p>
+    <p class="text-center">Precio: ${{product.price}}</p>
+    <p class="text-center">Stock: {{product.stock}}</p>
+    <div class="text-center mt-4">
+        <button class="btn btn-success" onclick="addToCart('{{cartId}}', '{{product._id}}')">Agregar al Carrito</button>
+        <a href="/" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+</div>
+<script>
+    async function addToCart(cartId, productId) {
+        try {
+            const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'POST' });
+            if (response.ok) {
+            } else {
+                throw new Error('Error al agregar el producto al carrito');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>

@@ -1,11 +1,42 @@
-<h1>Lista de Productos</h1>
-
-<ul>
-    {{#each products}}
-        <li>{{this.title}} - Precio: ${{this.price}}</li>
-    {{/each}}
-</ul>
-
-<div class="button-container">
-    <a href="/realtimeproducts" class="form-button button-add-more">Agregar más productos</a>
+<div class="container">
+    <h1 class="text-center">Lista de Productos</h1>
+    <div class="row">
+        {{#each payload}}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.title}}</h5>
+                    <p class="card-text">{{this.description}}</p>
+                    <p class="text-muted">Precio: ${{this.price}}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="/products/{{this._id}}" class="btn btn-primary btn-sm">Ver Detalles</a>
+                    <button class="btn btn-success btn-sm" onclick="addToCart('{{../cartId}}', '{{this._id}}')">Agregar al Carrito</button>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    <nav class="pagination text-center mt-4">
+        {{#if hasPrevPage}}
+        <a href="{{prevLink}}" class="btn btn-outline-primary">Anterior</a>
+        {{/if}}
+        <span>Página {{page}} de {{totalPages}}</span>
+        {{#if hasNextPage}}
+        <a href="{{nextLink}}" class="btn btn-outline-primary">Siguiente</a>
+        {{/if}}
+    </nav>
 </div>
+<script>
+    async function addToCart(cartId, productId) {
+        try {
+            const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'POST' });
+            if (response.ok) {
+            } else {
+                throw new Error('Error al agregar el producto al carrito');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>

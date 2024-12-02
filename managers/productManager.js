@@ -4,47 +4,81 @@ const productsFilePath = path.join(__dirname, '../data/productos.json');
 
 class ProductManager {
     async getAllProducts(limit) {
-        const products = await this._readProductsFile();
-        return limit ? products.slice(0, Number(limit)) : products;
+        try {
+            const products = await this._readProductsFile();
+            return limit ? products.slice(0, Number(limit)) : products;
+        } catch (error) {
+            console.error('Error al obtener todos los productos:', error);
+            return [];
+        }
     }
 
     async getProductById(id) {
-        const products = await this._readProductsFile();
-        return products.find(product => product.id === id);
+        try {
+            const products = await this._readProductsFile();
+            return products.find(product => product.id === id);
+        } catch (error) {
+            console.error('Error al obtener producto por ID:', error);
+            return null;
+        }
     }
 
     async addProduct(newProductData) {
-        const products = await this._readProductsFile();
-        const newProduct = { id: Date.now().toString(), ...newProductData, status: true };
-        products.push(newProduct);
-        await this._writeProductsFile(products);
-        return newProduct;
+        try {
+            const products = await this._readProductsFile();
+            const newProduct = { id: Date.now().toString(), ...newProductData, status: true };
+            products.push(newProduct);
+            await this._writeProductsFile(products);
+            return newProduct;
+        } catch (error) {
+            console.error('Error al agregar un nuevo producto:', error);
+            throw error;
+        }
     }
 
     async updateProduct(id, updates) {
-        const products = await this._readProductsFile();
-        const index = products.findIndex(product => product.id === id);
-        if (index === -1) return null;
-        products[index] = { ...products[index], ...updates };
-        await this._writeProductsFile(products);
-        return products[index];
+        try {
+            const products = await this._readProductsFile();
+            const index = products.findIndex(product => product.id === id);
+            if (index === -1) return null;
+            products[index] = { ...products[index], ...updates };
+            await this._writeProductsFile(products);
+            return products[index];
+        } catch (error) {
+            console.error('Error al actualizar el producto:', error);
+            return null;
+        }
     }
 
     async deleteProduct(id) {
-        const products = await this._readProductsFile();
-        const filteredProducts = products.filter(product => product.id !== id);
-        await this._writeProductsFile(filteredProducts);
-        return filteredProducts;
+        try {
+            const products = await this._readProductsFile();
+            const filteredProducts = products.filter(product => product.id !== id);
+            await this._writeProductsFile(filteredProducts);
+            return filteredProducts;
+        } catch (error) {
+            console.error('Error al eliminar el producto:', error);
+            return [];
+        }
     }
 
     async _readProductsFile() {
-        const data = await fs.readFile(productsFilePath, 'utf-8');
-        return JSON.parse(data);
+        try {
+            const data = await fs.readFile(productsFilePath, 'utf-8');
+            return JSON.parse(data || '[]');
+        } catch (error) {
+            console.error('Error al leer el archivo de productos:', error);
+            return [];
+        }
     }
 
     async _writeProductsFile(data) {
-        await fs.writeFile(productsFilePath, JSON.stringify(data, null, 2));
+        try {
+            await fs.writeFile(productsFilePath, JSON.stringify(data, null, 2));
+        } catch (error) {
+            console.error('Error al escribir en el archivo de productos:', error);
+        }
     }
 }
 
-module.exports = new ProductManager();
+module.exports = ProductManager;
